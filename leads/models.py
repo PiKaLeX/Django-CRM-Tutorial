@@ -1,15 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
 
 # Creating our own User class for future upgrade. 
 class User(AbstractUser):
-    pass
+    is_organisor = models.BooleanField(default=True)
+    is_agent = models.BooleanField(default=False)
 
-class Agent(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"{self.user.username},{self.user.email}"
+        return f"{self.user.username}"
+
+class Agent(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    organisation = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username}"
 
 class Lead(models.Model):
     # Basic fields
@@ -18,25 +27,20 @@ class Lead(models.Model):
     age = models.IntegerField(default=0)
 
     # Foreign Key
-    agent = models.ForeignKey("Agent", on_delete=models.CASCADE)
+    organisation = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
+    agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
 
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-    # Just for learning purpose for different field available.
 
-    # SOURCE_CHOICES = (
-    #     ("Youtube", "Youtube"), # First is actual word in DB, second is the text to display. 
-    #     ("Google", "Google"),
-    #     ("Newsletter", "Newsletter"),
-        
-    # )
+def post_user_created_signals(sender, instance, created, **kwargs):
+    print(f"{sender=}")
+    print(f"{instance=}")
+    print(f"{created=}")
+    print(f"{kwargs=}")
+    if created:
+        # Create a new UserProfile
+        UserProfile.objects.create(user=instance)
 
-    #phoned = models.BooleanField(default=False)
-    #source = models.CharField(choices=SOURCE_CHOICES, max_length=100)
-
-    #profile_picture = models.ImageField(blank=True, null=True)
-    #special_files = models.FileField(blank=True, null=True)
-
-
-
+post_save.connect(post_user_created_signals, sender=User)

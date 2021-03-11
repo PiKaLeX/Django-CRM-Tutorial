@@ -7,15 +7,15 @@
         <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
             <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
                 <div>
-                    <h1 class="text-sm title-font text-gray-500 tracking-widest">Update lead</h1>            
+                    <h1 class="text-sm title-font text-gray-500 tracking-widest">Update agent</h1>            
                 </div>
                 <div> 
-                    <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:lead-detail' lead.pk %}">Go back to details</a>
+                    <a class="text-gray-500 hover:text-blue-500" href="{% url 'agents:agents-detail' agent.pk %}">Go back to details</a>
                 </div>
             </div>
-            <h1 class="text-white text-3xl title-font font-medium mb-4">{{ lead.first_name }} {{ lead.last_name }}</h1>
+            <h1 class="text-white text-3xl title-font font-medium mb-4">{{ agent.user.first_name }} {{ agent.user.last_name }}</h1>
             <div class="flex mb-4">
-                <a href="{% url 'leads:lead-detail' lead.pk %}" class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1">Overview</a>
+                <a href="{% url 'agents:agents-detail' agent.pk %}" class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1">Overview</a>
                 <a class="flex-grow border-b-2 border-gray-800 py-2 text-lg px-1">Reviews</a>
                 <a class="flex-grow text-indigo-400 border-b-2 border-indigo-500 py-2 text-lg px-1">Update details</a>
             </div>
