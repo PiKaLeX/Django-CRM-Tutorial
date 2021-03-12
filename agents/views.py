@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.views import generic
 from django.core.mail import send_mail
 
+from random import randrange
+
 from leads.models import Agent
 from .forms import  AgentModelForm
 from .mixins import OrganisorAndLoginRequiredMixin
@@ -31,15 +33,23 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         return reverse('agents:agents-list')
 
     def form_valid(self, form):
-        agent = form.save(commit=False)
-        agent.organisation = self.request.user.userprofile
-        form.save()
+        user = form.save(commit=False)
+        user.is_agent = True
+        user.is_organisor = False
+        user.set_password(f"{randrange(1000)}")
+        user.save()
+        Agent.objects.create(
+            user=user,
+            organisation=self.request.user.userprofile
+        )
+        #agent.organisation = self.request.user.userprofile
+        #form.save()
         # TODO send Email
         send_mail(
-            subject="An agent has been created", 
-            message="Go to the site to see the new agent",
-            from_email="test@test.com", 
-            recipient_list=["test2@test.com"],
+            subject="You are invited ot be an Agent", 
+            message="you were added as an agent on DJCRM. Please come login to start working.",
+            from_email="organiser@djcrm.com", 
+            recipient_list=[user.email],
         )
         return super(AgentCreateView, self).form_valid(form)
 

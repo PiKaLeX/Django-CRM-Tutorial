@@ -24,11 +24,16 @@ class Lead(models.Model):
     # Basic fields
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-    age = models.IntegerField(default=0)
+    age = models.IntegerField(default=0)    
+    description = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
 
     # Foreign Key
     organisation = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey("Category", related_name="leads", null=True, blank=True, on_delete=models.SET_NULL)
 
     
     def __str__(self):
@@ -44,3 +49,10 @@ def post_user_created_signals(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 post_save.connect(post_user_created_signals, sender=User)
+
+class Category(models.Model):    
+    name = models.CharField(max_length=30) # New, Contacted, Converted, Unconverted
+    organisation = models.ForeignKey("UserProfile", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
